@@ -60,9 +60,12 @@ def evaluate(model, loader, criterion, device):
 
 def main():
 
-    EPOCHS = 100
-    LR = 0.001
-    NUM_CLASSES = 10
+    EPOCHS = ResNetConfig.EPOCHS
+    LR = ResNetConfig.LR
+    if ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_10:
+        NUM_CLASSES = 10
+    else:
+        exit(-1)
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -120,7 +123,7 @@ def main():
 
         if test_acc > best_acc:
             best_acc = test_acc
-            torch.save(model, "best_{}_cifar10.pth".format(ResNetConfig.modelName))
+            torch.save(model, "best_{}_{}.pth".format(ResNetConfig.modelName,ResNetConfig.DATASET))
 
     print(f"Best Test Accuracy: {best_acc:.4f}")
 

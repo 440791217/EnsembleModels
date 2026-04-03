@@ -14,7 +14,15 @@ ResNet34='resnet34'
 ResNet50='resnet50'
 ResNet101='resnet101'
 ResNet152='resnet152'
-modelName=ResNet101
+
+DATASET_CIFAR_10='cifar10'
+DATASET_CIFAR_100='cifar100'
+
+EPOCHS = 100
+LR = 0.001
+DATASET=DATASET_CIFAR_10
+# NUM_CLASSES = 10
+modelName=ResNet152
 
 def GetCifar_10(BATCH_SIZE=128):
     train_transform = transforms.Compose([
