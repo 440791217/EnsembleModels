@@ -32,7 +32,7 @@ def evaluate(model, loader, criterion, device):
     return epoch_loss, epoch_acc
 
 if __name__=='__main__':
-
+    print(ResNetConfig.modelName)
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_loader,test_loader=ResNetConfig.GetCifar_10()
     model = torch.load("best_{}_cifar10.pth".format(ResNetConfig.modelName),weights_only=False)

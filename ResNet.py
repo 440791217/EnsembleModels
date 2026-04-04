@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 # from torchvision.models
 import ResNetConfig
+import DatasetCiFar
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
@@ -60,10 +61,14 @@ def evaluate(model, loader, criterion, device):
 
 def main():
 
-    EPOCHS = ResNetConfig.EPOCHS
-    LR = ResNetConfig.LR
+    print(ResNetConfig.modelName)
     if ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_10:
+        ####
+        train_loader,test_loader=DatasetCiFar.GetCifar_10()
         NUM_CLASSES = 10
+    elif  ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_100:
+        train_loader,test_loader=DatasetCiFar.GetCifar_100()
+        NUM_CLASSES=100
     else:
         exit(-1)
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -99,15 +104,21 @@ def main():
     model = model.to(DEVICE)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=LR)
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
+    optimizer = torch.optim.SGD(
+        model.parameters(),
+        lr=0.1,
+        momentum=0.9,
+        weight_decay=5e-4
+    )
+    
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.2)
 
     best_acc = 0.0
 
-    ####
-    train_loader,test_loader=ResNetConfig.GetCifar_10()
+
     
-    for epoch in range(EPOCHS):
+    for epoch in range(ResNetConfig.EPOCHS):
         train_loss, train_acc = train_one_epoch(
             model, train_loader, criterion, optimizer, DEVICE
         )
@@ -116,7 +127,7 @@ def main():
         )
         scheduler.step()
 
-        print(f"Epoch [{epoch + 1}/{EPOCHS}]")
+        print(f"{ResNetConfig.modelName}:Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}")
         print(f"Test  Loss: {test_loss:.4f} | Test  Acc: {test_acc:.4f}")
         print("-" * 50)
