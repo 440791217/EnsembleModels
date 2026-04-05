@@ -147,6 +147,8 @@ def main():
             torch.save(checkpoint, best_path)
 
     print(f"Best Test Accuracy: {best_acc:.4f}")
+    # 2. 额外保存一个纯模型（方便测试）
+    torch.save(model, best_path.replace(".pth", ".m"))
 
 
 if __name__ == "__main__":
