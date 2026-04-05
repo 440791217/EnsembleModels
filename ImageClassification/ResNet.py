@@ -1,10 +1,9 @@
+import os
 import multiprocessing
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms, models
-# from torchvision.models
+from torchvision import models
 import ImageClassification.ResNetConfig as ResNetConfig
 import Datasets.CiFar as CiFar
 
@@ -30,9 +29,7 @@ def train_one_epoch(model, loader, criterion, optimizer, device):
         total += labels.size(0)
         correct += predicted.eq(labels).sum().item()
 
-    epoch_loss = running_loss / total
-    epoch_acc = correct / total
-    return epoch_loss, epoch_acc
+    return running_loss / total, correct / total
 
 
 @torch.no_grad()
@@ -54,51 +51,37 @@ def evaluate(model, loader, criterion, device):
         total += labels.size(0)
         correct += predicted.eq(labels).sum().item()
 
-    epoch_loss = running_loss / total
-    epoch_acc = correct / total
-    return epoch_loss, epoch_acc
+    return running_loss / total, correct / total
 
 
 def main():
-
     print(ResNetConfig.MODEL_NAME)
-    if ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_10:
-        ####
-        train_loader,test_loader=CiFar.GetCifar_10()
+
+    if ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_10:
+        train_loader, test_loader = CiFar.GetCifar_10()
         NUM_CLASSES = 10
-    elif  ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_100:
-        train_loader,test_loader=CiFar.GetCifar_100()
-        NUM_CLASSES=100
+    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100:
+        train_loader, test_loader = CiFar.GetCifar_100()
+        NUM_CLASSES = 100
     else:
-        exit(-1)
+        raise ValueError("Invalid dataset")
+
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-    
-    if ResNetConfig.MODEL_NAME==ResNetConfig.ResNet18:
+    if ResNetConfig.MODEL_NAME == ResNetConfig.ResNet18:
         model = models.resnet18(weights=None)
-    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet34:
+    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet34:
         model = models.resnet34(weights=None)
-    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet50:
+    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet50:
         model = models.resnet50(weights=None)
-    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet101:
+    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet101:
         model = models.resnet101(weights=None)
-    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet152:
+    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet152:
         model = models.resnet152(weights=None)
     else:
-        print("Invalid Models!")
-        exit(-1)
+        raise ValueError("Invalid model")
 
-
-    # 改成更适合 CIFAR-10 的结构
-    model.conv1 = nn.Conv2d(
-        in_channels=3,
-        out_channels=64,
-        kernel_size=3,
-        stride=1,
-        padding=1,
-        bias=False
-    )
+    model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
     model.maxpool = nn.Identity()
     model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
     model = model.to(DEVICE)
@@ -111,34 +94,61 @@ def main():
         momentum=ResNetConfig.MOMENTUM,
         weight_decay=ResNetConfig.WEIGHT_DECAY
     )
-    
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=ResNetConfig.STEP_SIZE, gamma=ResNetConfig.GAMMA)
 
+    scheduler = optim.lr_scheduler.StepLR(
+        optimizer,
+        step_size=ResNetConfig.STEP_SIZE,
+        gamma=ResNetConfig.GAMMA
+    )
+
+    latest_path = f"latest_{ResNetConfig.MODEL_NAME}_{ResNetConfig.DATASET}.pth"
+    best_path = f"best_{ResNetConfig.MODEL_NAME}_{ResNetConfig.DATASET}.pth"
+
+    start_epoch = 0
     best_acc = 0.0
 
+    if os.path.exists(latest_path):
+        print(f"恢复训练: {latest_path}")
+        checkpoint = torch.load(latest_path, map_location=DEVICE)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        start_epoch = checkpoint["epoch"] + 1
+        best_acc = checkpoint.get("best_acc", 0.0)
+        print(f"从 epoch {start_epoch} 继续，best_acc={best_acc:.4f}")
 
-    
-    for epoch in range(ResNetConfig.EPOCHS):
-        train_loss, train_acc = train_one_epoch(
-            model, train_loader, criterion, optimizer, DEVICE
-        )
-        test_loss, test_acc = evaluate(
-            model, test_loader, criterion, DEVICE
-        )
+    for epoch in range(start_epoch, ResNetConfig.EPOCHS):
+        train_loss, train_acc = train_one_epoch(model, train_loader, criterion, optimizer, DEVICE)
+        test_loss, test_acc = evaluate(model, test_loader, criterion, DEVICE)
         scheduler.step()
 
-        print(f"{ResNetConfig.MODEL_NAME}:Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
+        print(f"{ResNetConfig.MODEL_NAME}: Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}")
         print(f"Test  Loss: {test_loss:.4f} | Test  Acc: {test_acc:.4f}")
         print("-" * 50)
 
+        checkpoint = {
+            "epoch": epoch,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "scheduler_state_dict": scheduler.state_dict(),
+            "best_acc": best_acc,
+            "train_loss": train_loss,
+            "train_acc": train_acc,
+            "test_loss": test_loss,
+            "test_acc": test_acc,
+        }
+
+        torch.save(checkpoint, latest_path)
+
         if test_acc > best_acc:
             best_acc = test_acc
-            torch.save(model, "best_{}_{}.pth".format(ResNetConfig.MODEL_NAME,ResNetConfig.DATASET))
+            checkpoint["best_acc"] = best_acc
+            torch.save(checkpoint, best_path)
 
     print(f"Best Test Accuracy: {best_acc:.4f}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     multiprocessing.freeze_support()
     main()
