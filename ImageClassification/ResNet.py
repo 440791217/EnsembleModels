@@ -5,8 +5,8 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 # from torchvision.models
-import ResNetConfig
-import DatasetCiFar
+import ImageClassification.ResNetConfig as ResNetConfig
+import Datasets.CiFar as CiFar
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
@@ -61,13 +61,13 @@ def evaluate(model, loader, criterion, device):
 
 def main():
 
-    print(ResNetConfig.modelName)
+    print(ResNetConfig.MODEL_NAME)
     if ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_10:
         ####
-        train_loader,test_loader=DatasetCiFar.GetCifar_10()
+        train_loader,test_loader=CiFar.GetCifar_10()
         NUM_CLASSES = 10
     elif  ResNetConfig.DATASET==ResNetConfig.DATASET_CIFAR_100:
-        train_loader,test_loader=DatasetCiFar.GetCifar_100()
+        train_loader,test_loader=CiFar.GetCifar_100()
         NUM_CLASSES=100
     else:
         exit(-1)
@@ -75,15 +75,15 @@ def main():
 
 
     
-    if ResNetConfig.modelName==ResNetConfig.ResNet18:
+    if ResNetConfig.MODEL_NAME==ResNetConfig.ResNet18:
         model = models.resnet18(weights=None)
-    elif ResNetConfig.modelName==ResNetConfig.ResNet34:
+    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet34:
         model = models.resnet34(weights=None)
-    elif ResNetConfig.modelName==ResNetConfig.ResNet50:
+    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet50:
         model = models.resnet50(weights=None)
-    elif ResNetConfig.modelName==ResNetConfig.ResNet101:
+    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet101:
         model = models.resnet101(weights=None)
-    elif ResNetConfig.modelName==ResNetConfig.ResNet152:
+    elif ResNetConfig.MODEL_NAME==ResNetConfig.ResNet152:
         model = models.resnet152(weights=None)
     else:
         print("Invalid Models!")
@@ -107,12 +107,12 @@ def main():
 
     optimizer = torch.optim.SGD(
         model.parameters(),
-        lr=0.1,
-        momentum=0.9,
-        weight_decay=5e-4
+        lr=ResNetConfig.LR,
+        momentum=ResNetConfig.MOMENTUM,
+        weight_decay=ResNetConfig.WEIGHT_DECAY
     )
     
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=25, gamma=0.2)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=ResNetConfig.STEP_SIZE, gamma=ResNetConfig.GAMMA)
 
     best_acc = 0.0
 
@@ -127,14 +127,14 @@ def main():
         )
         scheduler.step()
 
-        print(f"{ResNetConfig.modelName}:Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
+        print(f"{ResNetConfig.MODEL_NAME}:Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}")
         print(f"Test  Loss: {test_loss:.4f} | Test  Acc: {test_acc:.4f}")
         print("-" * 50)
 
         if test_acc > best_acc:
             best_acc = test_acc
-            torch.save(model, "best_{}_{}.pth".format(ResNetConfig.modelName,ResNetConfig.DATASET))
+            torch.save(model, "best_{}_{}.pth".format(ResNetConfig.MODEL_NAME,ResNetConfig.DATASET))
 
     print(f"Best Test Accuracy: {best_acc:.4f}")
 

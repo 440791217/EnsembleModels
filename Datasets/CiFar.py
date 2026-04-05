@@ -3,7 +3,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
 
-def GetCifar_10(BATCH_SIZE=128,num_workers=32):
+def GetCifar_10(BATCH_SIZE=128,num_workers=8):
     train_transform = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
@@ -52,7 +52,7 @@ def GetCifar_10(BATCH_SIZE=128,num_workers=32):
     )
     return train_loader,test_loader
 
-def GetCifar_100(BATCH_SIZE=128,num_workers=32):
+def GetCifar_100(BATCH_SIZE=128,num_workers=8):
     train_transform = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
