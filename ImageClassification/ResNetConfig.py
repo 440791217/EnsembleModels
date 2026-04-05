@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms, models
+import os
 # from torchvision.models
 
 
@@ -22,7 +23,8 @@ EPOCHS = 100
 # DATASET=DATASET_CIFAR_100
 DATASET=DATASET_CIFAR_10
 # NUM_CLASSES = 10
-MODEL_NAME=ResNet152
+MODEL_NAME=ResNet18
+MODEL_DIR_PATH=os.path.join('.','models',DATASET)
 #optimizer
 LR=0.1
 MOMENTUM=0.9

@@ -100,9 +100,11 @@ def main():
         step_size=ResNetConfig.STEP_SIZE,
         gamma=ResNetConfig.GAMMA
     )
-
+    
     latest_path = f"latest_{ResNetConfig.MODEL_NAME}_{ResNetConfig.DATASET}.pth"
+    latest_path = os.path.join(ResNetConfig.MODEL_DIR_PATH,latest_path)
     best_path = f"best_{ResNetConfig.MODEL_NAME}_{ResNetConfig.DATASET}.pth"
+    best_path = os.path.join(ResNetConfig.MODEL_DIR_PATH,best_path)
 
     start_epoch = 0
     best_acc = 0.0

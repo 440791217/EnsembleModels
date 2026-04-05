@@ -7,6 +7,7 @@ from torchvision import datasets, transforms, models
 # from torchvision.models
 import ImageClassification.ResNetConfig as ResNetConfig
 import Datasets.CiFar as CiFar
+import os
 
 @torch.no_grad()
 def evaluate(model, loader, criterion, device):
@@ -35,7 +36,9 @@ if __name__=='__main__':
     print(ResNetConfig.MODEL_NAME)
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_loader,test_loader=CiFar.GetCifar_10()
-    model = torch.load("best_{}_cifar10.m".format(ResNetConfig.MODEL_NAME),weights_only=False)
+    modelPath="best_{}_cifar10.m".format(ResNetConfig.MODEL_NAME)
+    modelPath=os.path.join(ResNetConfig.MODEL_DIR_PATH,modelPath)
+    model = torch.load(modelPath,weights_only=False)
     model.eval()
     criterion = nn.CrossEntropyLoss()
     test_loss, test_acc = evaluate(
