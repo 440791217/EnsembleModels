@@ -112,7 +112,7 @@ def main():
         weight_decay=5e-4
     )
     
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.2)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=25, gamma=0.2)
 
     best_acc = 0.0
 
