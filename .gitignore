@@ -2,3 +2,4 @@
 *.pth
 *.m
 /data
+*.log

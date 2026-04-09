@@ -32,11 +32,20 @@ def evaluate(model, loader, criterion, device):
     epoch_acc = correct / total
     return epoch_loss, epoch_acc
 
-if __name__=='__main__':
+def main():
+    if ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_10:
+        train_loader, test_loader = CiFar.GetCifar_10()
+        # NUM_CLASSES = 10
+    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100:
+        train_loader, test_loader = CiFar.GetCifar_100()
+        # NUM_CLASSES = 100
+    else:
+        raise ValueError("Invalid dataset")
+
     print(ResNetConfig.MODEL_NAME)
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_loader,test_loader=CiFar.GetCifar_10()
-    modelPath="best_{}_cifar10.m".format(ResNetConfig.MODEL_NAME)
+    # train_loader,test_loader=CiFar.GetCifar_10()
+    modelPath="best_{}_{}.m".format(ResNetConfig.MODEL_NAME,ResNetConfig.DATASET)
     modelPath=os.path.join(ResNetConfig.MODEL_DIR_PATH,modelPath)
     model = torch.load(modelPath,weights_only=False)
     model.eval()
@@ -45,3 +54,15 @@ if __name__=='__main__':
         model, test_loader, criterion, DEVICE
     )
     print(f"Test  Loss: {test_loss:.4f} | Test  Acc: {test_acc:.4f}")
+
+if __name__=='__main__':
+    modelNames=[
+        ResNetConfig.ResNet18,
+        ResNetConfig.ResNet34,
+        ResNetConfig.ResNet50,
+        ResNetConfig.ResNet101,
+        ResNetConfig.ResNet152
+    ]
+    for modelName in modelNames:
+        ResNetConfig.MODEL_NAME=modelName
+        main()

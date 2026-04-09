@@ -63,6 +63,9 @@ def main():
     elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100:
         train_loader, test_loader = CiFar.GetCifar_100()
         NUM_CLASSES = 100
+    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100_COARSE:
+        train_loader, test_loader = CiFar.GetCifar_100_Coarse()
+        NUM_CLASSES = 20
     else:
         raise ValueError("Invalid dataset")
 
@@ -155,4 +158,13 @@ def main():
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    main()
+    modelNames=[
+        ResNetConfig.ResNet18,
+        ResNetConfig.ResNet34,
+        ResNetConfig.ResNet50,
+        ResNetConfig.ResNet101,
+        # ResNetConfig.ResNet152,
+    ]
+    for modelName in modelNames:
+        ResNetConfig.MODEL_NAME=modelName
+        main()
