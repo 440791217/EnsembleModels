@@ -66,6 +66,9 @@ def main():
     elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100_COARSE:
         train_loader, test_loader = CiFar.GetCifar_100_Coarse()
         NUM_CLASSES = 20
+    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100_SUPER:
+        train_loader, test_loader = CiFar.GetCifar_100_Super5()
+        NUM_CLASSES = 5
     else:
         raise ValueError("Invalid dataset")
 
