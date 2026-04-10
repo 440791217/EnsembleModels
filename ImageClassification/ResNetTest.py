@@ -61,7 +61,7 @@ if __name__=='__main__':
         ResNetConfig.ResNet34,
         ResNetConfig.ResNet50,
         ResNetConfig.ResNet101,
-        ResNetConfig.ResNet152
+        # ResNetConfig.ResNet152
     ]
     for modelName in modelNames:
         ResNetConfig.MODEL_NAME=modelName
