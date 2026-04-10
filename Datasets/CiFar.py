@@ -23,7 +23,7 @@ def GetTransform():
     ])
     return train_transform,test_transform
 
-def GetCifar_10(BATCH_SIZE=128,num_workers=8):
+def GetCifar_10(batch_size=128,num_workers=8):
     train_transform,test_transform=GetTransform()
 
     train_dataset = datasets.CIFAR10(
@@ -43,20 +43,20 @@ def GetCifar_10(BATCH_SIZE=128,num_workers=8):
     # 先跑通，Windows 下先别开多进程
     train_loader = DataLoader(
         train_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
     )
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers
     )
     return train_loader,test_loader
 
-def GetCifar_100(BATCH_SIZE=128,num_workers=8):
+def GetCifar_100(batch_size=128,num_workers=8):
     train_transform,test_transform=GetTransform()
 
     train_dataset = datasets.CIFAR100(
@@ -75,14 +75,14 @@ def GetCifar_100(BATCH_SIZE=128,num_workers=8):
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
     )
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers
     )
@@ -133,7 +133,7 @@ class CIFAR100Coarse(datasets.CIFAR100):
 #     "vehicles_2",
 # ]
 
-def GetCifar_100_Coarse(BATCH_SIZE=128,num_workers=8):
+def GetCifar_100_Coarse(batch_size=128,num_workers=8):
     train_transform,test_transform=GetTransform()
 
     train_dataset = CIFAR100Coarse(root="./data", train=True, transform=train_transform)
@@ -143,14 +143,14 @@ def GetCifar_100_Coarse(BATCH_SIZE=128,num_workers=8):
 
     train_loader = DataLoader(
         train_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
     )
 
     test_loader = DataLoader(
         test_dataset,
-        batch_size=BATCH_SIZE,
+        batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers
     )

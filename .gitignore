@@ -3,3 +3,4 @@
 *.m
 /data
 *.log
+/golden
