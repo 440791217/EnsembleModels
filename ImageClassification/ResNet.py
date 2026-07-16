@@ -6,6 +6,7 @@ import torch.optim as optim
 from torchvision import models
 import ImageClassification.ResNetConfig as ResNetConfig
 import Datasets.CiFar as CiFar
+import ResNetUtils
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device):
@@ -54,42 +55,33 @@ def evaluate(model, loader, criterion, device):
     return running_loss / total, correct / total
 
 
-def main():
-    print(ResNetConfig.MODEL_NAME)
+def main(modelName,dataset):
+    print(modelName)
 
-    if ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_10:
-        train_loader, test_loader = CiFar.GetCifar_10()
-        NUM_CLASSES = 10
-    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100:
-        train_loader, test_loader = CiFar.GetCifar_100()
-        NUM_CLASSES = 100
-    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100_COARSE:
-        train_loader, test_loader = CiFar.GetCifar_100_Coarse()
-        NUM_CLASSES = 20
-    elif ResNetConfig.DATASET == ResNetConfig.DATASET_CIFAR_100_SUPER:
-        train_loader, test_loader = CiFar.GetCifar_100_Super5()
-        NUM_CLASSES = 5
-    else:
-        raise ValueError("Invalid dataset")
+    train_loader, test_loader=ResNetUtils.GetLoader(dataset=dataset)
+    NUM_CLASSES=ResNetUtils.GetClassNum(dataset=dataset)
 
     DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    if ResNetConfig.MODEL_NAME == ResNetConfig.ResNet18:
+    if modelName == ResNetConfig.ResNet18:
         model = models.resnet18(weights=None)
-    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet34:
+    elif modelName == ResNetConfig.ResNet34:
         model = models.resnet34(weights=None)
-    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet50:
+    elif modelName == ResNetConfig.ResNet50:
         model = models.resnet50(weights=None)
-    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet101:
+    elif modelName == ResNetConfig.ResNet101:
         model = models.resnet101(weights=None)
-    elif ResNetConfig.MODEL_NAME == ResNetConfig.ResNet152:
+    elif modelName == ResNetConfig.ResNet152:
         model = models.resnet152(weights=None)
     else:
         raise ValueError("Invalid model")
 
-    model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
-    model.maxpool = nn.Identity()
-    model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
+    if 'cifar' in dataset:
+        model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
+        model.maxpool = nn.Identity()
+        model.fc = nn.Linear(model.fc.in_features, NUM_CLASSES)
+    else:
+        raise ValueError("Invalid model")
     model = model.to(DEVICE)
 
     criterion = nn.CrossEntropyLoss()
@@ -107,9 +99,9 @@ def main():
         gamma=ResNetConfig.GAMMA
     )
     
-    latest_path = f"latest_{ResNetConfig.MODEL_NAME}_{ResNetConfig.DATASET}.pth"
+    latest_path = f"latest_{modelName}_{dataset}.pth"
     latest_path = os.path.join(ResNetConfig.MODEL_DIR_PATH,latest_path)
-    best_path = f"best_{ResNetConfig.MODEL_NAME}_{ResNetConfig.DATASET}.pth"
+    best_path = f"best_{modelName}_{dataset}.pth"
     best_path = os.path.join(ResNetConfig.MODEL_DIR_PATH,best_path)
 
     start_epoch = 0
@@ -130,7 +122,7 @@ def main():
         test_loss, test_acc = evaluate(model, test_loader, criterion, DEVICE)
         scheduler.step()
 
-        print(f"{ResNetConfig.MODEL_NAME}: Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
+        print(f"{modelName}: Epoch [{epoch + 1}/{ResNetConfig.EPOCHS}]")
         print(f"Train Loss: {train_loss:.4f} | Train Acc: {train_acc:.4f}")
         print(f"Test  Loss: {test_loss:.4f} | Test  Acc: {test_acc:.4f}")
         print("-" * 50)
@@ -169,5 +161,4 @@ if __name__ == "__main__":
         # ResNetConfig.ResNet152,
     ]
     for modelName in modelNames:
-        ResNetConfig.MODEL_NAME=modelName
-        main()
+        main(modelName,dataset=ResNetConfig.DATASET)

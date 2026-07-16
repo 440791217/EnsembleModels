@@ -1,6 +1,10 @@
 *.pyc
 *.pth
 *.m
-/data
 *.log
-/golden
+*.xlsx
+
+data
+golden
+out
+papers
