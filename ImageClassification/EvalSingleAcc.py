@@ -129,13 +129,14 @@ def print_formatted_report(report, prefix_info=""):
 # =========================================================================
 if __name__ == '__main__':
     model_names = [
-        ResNetConfig.ResNet18,
-        ResNetConfig.ResNet34,
-        ResNetConfig.ResNet50,
-        ResNetConfig.ResNet101,
+        # ResNetConfig.ResNet18+'_q8',
+        ResNetConfig.ResNet34+'_q8',
+        # ResNetConfig.ResNet50,
+        # ResNetConfig.ResNet101,
     ]
     dataset = ResNetConfig.DATASET_CIFAR_10
     ber_rates = [1e-7,1e-6,1e-5,1e-4, 1e-3,1e-2, 1e-1]
+    ber_rates = []
     inj_times = 3000
     data_type = FaultInjectionConfig.GetDType()
     data_type_name = FaultInjectionConfig.GetDTypeName(dataType=data_type)
@@ -149,7 +150,8 @@ if __name__ == '__main__':
         golden_dir = os.path.join('golden', dataset, model_name)
         golden_report = analyze_single_experiment(golden_dir)
         print_formatted_report(golden_report, prefix_info="--- [GOLDEN BASELINE] ---")
-        
+        if 1:
+            continue
         # 2. 遍历故障率进行评估
         for ber in ber_rates:
             print(f"\n" + "="*20 + f" BER: {ber} " + "="*20)

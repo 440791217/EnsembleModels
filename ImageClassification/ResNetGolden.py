@@ -67,9 +67,9 @@ def main(modelName,dataset):
 if __name__=='__main__':
     modelNames=[
         ResNetConfig.ResNet18,
-        ResNetConfig.ResNet34,
-        ResNetConfig.ResNet50,
-        ResNetConfig.ResNet101,
+        # ResNetConfig.ResNet34,
+        # ResNetConfig.ResNet50,
+        # ResNetConfig.ResNet101,
         # ResNetConfig.ResNet152
     ]
     for modelName in modelNames:

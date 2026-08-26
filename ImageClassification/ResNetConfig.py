@@ -15,6 +15,9 @@ ResNet50='resnet50'
 ResNet101='resnet101'
 ResNet152='resnet152'
 
+# ResNet18='q8resnet18'
+# ResNet34='q8resnet34'
+
 DATASET_CIFAR_10='cifar10'
 DATASET_CIFAR_100='cifar100'
 DATASET_CIFAR_100_COARSE='cifar100-coarse'
