@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # 2. 加载你本地训练好的 CIFAR-10 完整模型
     if 'cifar' in dataset:
         modelPath = "best_{}_{}.m".format(modelName, dataset)
-        modelPath = os.path.join(ResNetConfig.MODEL_DIR_PATH, modelPath)
+        modelPath = os.path.join(R'.','models',dataset, modelPath)
         print(f"===> 正在加载本地模型: {modelPath}")
         
         # 使用内存流加载，彻底洗掉 GPU 上下文痕迹

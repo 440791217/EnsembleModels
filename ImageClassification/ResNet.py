@@ -100,9 +100,9 @@ def main(modelName,dataset):
     )
     
     latest_path = f"latest_{modelName}_{dataset}.pth"
-    latest_path = os.path.join(ResNetConfig.MODEL_DIR_PATH,latest_path)
+    latest_path = os.path.join('.','models',dataset,latest_path)
     best_path = f"best_{modelName}_{dataset}.pth"
-    best_path = os.path.join(ResNetConfig.MODEL_DIR_PATH,best_path)
+    best_path = os.path.join('.','models',dataset,best_path)
 
     start_epoch = 0
     best_acc = 0.0

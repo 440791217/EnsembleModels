@@ -14,31 +14,6 @@ HOOK_TYPE_STAT=1
 HOOK_TYPE_FAULT=2
 
 
-
-# def InjectFaultsForNeurons(module, input):
-#     mydata=module.mydata
-#     # dataType=mydata['dataType']
-#     ber=mydata['ber']
-#     if isinstance(input, tuple):
-#         x = input[0]
-#     else:
-#         Logger.Error("Input is not tuple.")
-#         exit(-1)
-#     # print("Layer In Hook==>Id:{},name:{}".format(mydata['layerId'],mydata['layerName']))
-#     #convert data format
-#     origDType=x.dtype
-#     print('origDType:',origDType)
-#     # exit(-1)
-#     # x=x.to(dataType)
-#     #inject faults
-#     x_faults=BitFlipTool.Bitflip(x,ber)
-#     #recover data format
-#     # x_faults=x_faults.to(origDType)
-#     # print("shape:{}".format(x_faults.shape))
-#     # return (input,)
-#     return (x_faults,)
-
-
 def InjectFaultsForNeurons(module, input):
     mydata = module.mydata
     ber = mydata['ber']
@@ -193,17 +168,17 @@ def main(modelName,dataset,injTimes,dataLoader,\
     pass
 
 if __name__=='__main__':
-    isQuant=True
+    isQuant=False
     modelNames=[
-        # ResNetConfig.ResNet18,
+        ResNetConfig.ResNet18,
         # ResNetConfig.ResNet34,
         # ResNetConfig.ResNet50,
-        ResNetConfig.ResNet101,
+        # ResNetConfig.ResNet101,
         # ResNetConfig.ResNet152
     ]
     BerRates=[1e-7,1e-6,1e-5,1e-4,1e-3,1e-2,1e-1]
     # BerRates=[1e-1]
-    dataset=ResNetConfig.DATASET_CIFAR_10
+    dataset=ResNetConfig.DATASET_CIFAR_100
     injTimes=3000
     if isQuant:
         device=torch.device('cpu')

@@ -14,7 +14,7 @@ def convert_model(modelName,dataset,train_loader, test_loader):
     # 2. 加载你本地训练好的 CIFAR-10 完整模型
     if 'cifar' in dataset:
         modelPath = "best_{}_{}.m".format(modelName, dataset)
-        modelPath = os.path.join(ResNetConfig.MODEL_DIR_PATH, modelPath)
+        modelPath = os.path.join('.','models',dataset, modelPath)
         print(f"===> 正在加载本地模型: {modelPath}")
         
         # 使用内存流加载，彻底洗掉 GPU 上下文痕迹
@@ -57,7 +57,7 @@ def convert_model(modelName,dataset,train_loader, test_loader):
             images = images.detach().cpu().to(torch.float32)
             prepared_model(images)
             batch_count += 1
-            if batch_count >= 2000:  # 取前 10 个 batch 做校准
+            if batch_count >= 5000:  # 取前 10 个 batch 做校准
                 break
     print("校准完成！")
 
@@ -96,5 +96,5 @@ if __name__ == '__main__':
     print(f"INT8 量化模型准确率: {int8_acc:.2f}%")
 
     # （可选）保存量化后的模型
-    torch.save(quantized_model.state_dict(), f"quantized_{modelName}_cifar10.pth")
+    # torch.save(quantized_model.state_dict(), f"quantized_{modelName}_cifar10.pth")
     # print("===> 量化模型已成功保存至 quantized_resnet34_cifar10.pth")

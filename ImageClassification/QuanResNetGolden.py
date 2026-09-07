@@ -28,7 +28,7 @@ def evaluate_accuracy(model, data_loader, device="cpu"):
 
 if __name__ == '__main__':
     modelName = ResNetConfig.ResNet101
-    dataset = ResNetConfig.DATASET_CIFAR_10
+    dataset = ResNetConfig.DATASET_CIFAR_100
 
     goldenDir=os.path.join('golden',dataset,modelName+'_q8')
     if not os.path.exists(goldenDir):

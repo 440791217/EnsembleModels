@@ -40,6 +40,6 @@ def GetDTypeName(dataType):
 
 
 
-# def Device():
-#     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-#     return device
+def Device():
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return device

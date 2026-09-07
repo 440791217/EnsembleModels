@@ -23,7 +23,7 @@ def main(modelName,dataset):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu") 
     if 'cifar' in dataset:
         modelPath="best_{}_{}.m".format(modelName,dataset)
-        modelPath=os.path.join(ResNetConfig.MODEL_DIR_PATH,modelPath)
+        modelPath=os.path.join('.','models',dataset,modelPath)
         model = torch.load(modelPath,weights_only=False)
     else:
         model=ResNetUtils.GetTrainedModel(modelName=modelName,dataset=dataset)
